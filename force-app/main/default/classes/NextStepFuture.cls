@@ -27,9 +27,21 @@ public with sharing class NextStepFuture {
      * Opportunity Next Step field is a standard field
      * Update the corresponding test class AsynchronousTest and test method nextStepFuture_testUpdateAllNextStep to cover test this method
      */
-    //[public | private ] [static] data_type method_name (input parameters) {
-    //  The body of the method
-    //}
+
+    @future 
+    public static void testUpdateAllNextStep () {
+        List<Account> Accts = new List<Account>([SELECT Id, Name FROM Account]);
+        List<Opportunity> Opps = new List<Opportunity>([SELECT Id, Name FROM Opportunity]);
+        for (Account acc : Accts) {
+            acc.Next_Step__c = 'Meeting in the future';
+        }
+
+        for (Opportunity opp : Opps) {
+            opp.NextStep = 'Meeting in the future';
+        }    
+        update Accts;
+        update Opps;
+    }
 
     /*
     * Question 2
@@ -38,12 +50,11 @@ public with sharing class NextStepFuture {
     * Update the corresponding test class AsynchronousTest and test method nextStepFuture_testCreateDealAndUpdateRole to cover test this method
     */
     //Mix DML Error happens when you try to perform DML operations on setup and non-setup objects in a single transaction.
+
     public static void createDealAndUpdateRole() {
         Opportunity bigDeal = new Opportunity();
         insertBigDeal(bigDeal);
-
-        UserRole[] roles = [SELECT Id, Name FROM UserRole WHERE Id = :UserInfo.getUserRoleId() OR Name = 'CRO' LIMIT 1];
-        updateUserRoleName(roles);
+        updateUserRoleName();
     }
 
     // Helper method to insert big deal
@@ -58,7 +69,11 @@ public with sharing class NextStepFuture {
 
 
     // Helper method to update role name
-    private static void updateUserRoleName(UserRole[] roles){
+    @future
+    private static void updateUserRoleName(){
+
+        UserRole[] roles = [SELECT Id, Name FROM UserRole WHERE Id = :UserInfo.getUserRoleId() OR Name = 'CRO' LIMIT 1];
+
         UserRole role;
         if (roles.isEmpty()) {
             role = new UserRole();
